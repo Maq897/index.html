@@ -23,6 +23,7 @@ th {
     background-color: #f2f2f2;
     color: #343a40;
 }
-table tr td input{
-    width: 140px;
+table tr td form textarea{
+    width: 100%;
+    height:95%;
 }
