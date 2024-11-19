@@ -267,3 +267,7 @@ p {
     height: 145px;
 }
 
+.thelinktothepages {
+    text-decoration: none;
+    color: black;
+}
