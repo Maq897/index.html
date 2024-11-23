@@ -1,52 +1,65 @@
-document.getElementById('add-note').addEventListener('click', addNote);
+// Add a new note when the "Add Note" button is clicked
+document.getElementById('add-note').addEventListener('click', () => addNote());
 
-// Load notes from localStorage when the page is loaded
+// Load notes from localStorage when the page is fully loaded
 window.addEventListener('DOMContentLoaded', loadNotes);
 
+/**
+ * Adds a new note to the DOM and sets up event listeners.
+ * @param {string} content - The content of the new note (optional).
+ */
 function addNote(content = '') {
+    // Create the note container
     const note = document.createElement('div');
     note.classList.add('note');
-    
+
+    // Create the textarea for the note content
     const textarea = document.createElement('textarea');
-    textarea.value = content; // Set the textarea content if provided
+    textarea.value = content; // Set initial content, if provided
+    textarea.addEventListener('input', updateLocalStorage); // Save changes to localStorage
     note.appendChild(textarea);
 
+    // Create the delete button
     const deleteBtn = document.createElement('span');
     deleteBtn.textContent = 'X';
     deleteBtn.classList.add('delete');
     deleteBtn.addEventListener('click', () => {
-        note.remove();
-        updateLocalStorage();
+        note.remove(); // Remove the note
+        updateLocalStorage(); // Update localStorage
     });
     note.appendChild(deleteBtn);
-    
+
+    // Add the note to the notes container
     document.getElementById('notes').appendChild(note);
 
-    // Update local storage when the note content changes
-    textarea.addEventListener('input', updateLocalStorage);
-    
-    updateLocalStorage(); // Save immediately when a new note is added
+    // Ensure the textarea does not receive immediate focus
+    textarea.blur();
+
+    // Update localStorage immediately after adding a new note
+    updateLocalStorage();
 }
 
-// Function to update the local storage with the current notes
+/**
+ * Updates the localStorage with the current state of all notes.
+ */
 function updateLocalStorage() {
-    const notes = [];
-    document.querySelectorAll('.note textarea').forEach(textarea => {
-        notes.push({ content: textarea.value });
-    });
+    const notes = Array.from(document.querySelectorAll('.note textarea')).map(textarea => ({
+        content: textarea.value
+    }));
     localStorage.setItem('notes', JSON.stringify(notes));
 }
 
-// Function to load the notes from localStorage when the page loads
+/**
+ * Loads notes from localStorage and adds them to the DOM.
+ */
 function loadNotes() {
-    let savedNotes = [];
     try {
-        savedNotes = JSON.parse(localStorage.getItem('notes')) || [];
-    } catch (e) {
-        console.error('Failed to parse notes from localStorage:', e);
-    }
+        // Parse notes from localStorage or initialize with an empty array
+        const savedNotes = JSON.parse(localStorage.getItem('notes')) || [];
 
-    savedNotes.forEach(noteData => {
-        addNote(noteData.content); // Use the addNote function to create notes
-    });
+        // Add each saved note to the DOM
+        savedNotes.forEach(note => addNote(note.content));
+    } catch (error) {
+        console.error('Error loading notes from localStorage:', error);
+    }
 }
